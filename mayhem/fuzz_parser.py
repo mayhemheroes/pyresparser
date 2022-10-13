@@ -12,7 +12,7 @@ logging.disable(logging.CRITICAL)
 
 with atheris.instrument_imports():
     import pdfminer
-    import docx2text
+    import docx2txt
 
 import pyresparser.utils as utils
 
