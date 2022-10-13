@@ -14,6 +14,7 @@ import pdfminer
 import docx2txt
 
 import pyresparser.utils as utils
+from pyresparser import ResumeParser
 
 supported_exts = [".pdf", ".doc", ".docx"]
 
@@ -29,6 +30,7 @@ def TestOneInput(data):
 
     try:
         utils.get_number_of_pages(fd)
+        ResumeParser(fd.name).get_extracted_data()
         text = ' '.join(utils.extract_text(fd, ext).split())
         utils.extract_email(text)
         utils.extract_mobile_number(text)
