@@ -10,9 +10,8 @@ import warnings
 warnings.filterwarnings("ignore")
 logging.disable(logging.CRITICAL)
 
-with atheris.instrument_imports():
-    import pdfminer
-    import docx2txt
+import pdfminer
+import docx2txt
 
 import pyresparser.utils as utils
 
