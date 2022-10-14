@@ -2,40 +2,54 @@
 import io
 import logging
 import sys
+import tempfile
+import warnings
 from zipfile import BadZipFile
 
 import atheris
-import warnings
 
 warnings.filterwarnings("ignore")
 logging.disable(logging.CRITICAL)
 
-import pdfminer
-import docx2txt
+with atheris.instrument_imports():
+    import pyresparser.utils as utils
 
-import pyresparser.utils as utils
-from pyresparser import ResumeParser
-
-supported_exts = [".pdf", ".doc", ".docx"]
+supported_exts = [
+    (".pdf", False),
+    (".doc", True),
+    (".docx", True)
+]
 
 
 @atheris.instrument_func
 def TestOneInput(data):
     fdp = atheris.FuzzedDataProvider(data)
     #Pick file extension
-    ext = supported_exts[fdp.ConsumeIntInRange(0, len(supported_exts)-1)]
-    fd = io.BytesIO()
-    fd.name = "test" + ext
-    fd.write(fdp.ConsumeBytes(atheris.ALL_REMAINING))
+    ext, requires_file_path = supported_exts[fdp.ConsumeIntInRange(0, len(supported_exts)-1)]
+
+    temp_file = None
+    file_data = fdp.ConsumeBytes(atheris.ALL_REMAINING)
+    if requires_file_path or fdp.ConsumeBool():
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.write(file_data)
+        temp_file.flush()
+        fd = temp_file.name
+    else:
+        fd = io.BytesIO()
+        fd.write(file_data)
+        fd.name = "test" + ext
 
     try:
         utils.get_number_of_pages(fd)
-        ResumeParser(fd.name).get_extracted_data()
         text = ' '.join(utils.extract_text(fd, ext).split())
         utils.extract_email(text)
         utils.extract_mobile_number(text)
     except BadZipFile:
         pass
+
+    # Clean-up
+    if temp_file:
+        temp_file.close()
 
 
 def main():
