@@ -12,7 +12,9 @@ warnings.filterwarnings("ignore")
 logging.disable(logging.CRITICAL)
 
 with atheris.instrument_imports():
-    import pyresparser.utils as utils
+    import pdfminer
+    import docx2txt
+import pyresparser.utils as utils
 
 supported_exts = [
     (".pdf", False),
