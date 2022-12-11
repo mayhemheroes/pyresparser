@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 import io
 import logging
 import sys
@@ -7,11 +7,11 @@ import warnings
 from zipfile import BadZipFile
 
 import atheris
+with atheris.instrument_imports(include=['pyresparser']):
+    import pyresparser.utils as utils
 
 warnings.filterwarnings("ignore")
 logging.disable(logging.CRITICAL)
-
-import pyresparser.utils as utils
 
 supported_exts = [
     (".pdf", False),
@@ -20,7 +20,6 @@ supported_exts = [
 ]
 
 
-@atheris.instrument_func
 def TestOneInput(data):
     fdp = atheris.FuzzedDataProvider(data)
     #Pick file extension
